@@ -22,9 +22,12 @@ class Observable
         let id          = NSUUID()
         let observable  : Observable
         let observer    : (Observable) -> Void
+        let active      = MutableProperty<Bool>(true)
         
         func remove() -> Bool       { return observable.removeObserver(self) }
-        func notify()               { observer(observable) }
+        func notify() {
+            if active.get()!        { observer(observable) }
+        }
     }
     
     
