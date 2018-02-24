@@ -19,33 +19,34 @@ class Observable
 {
     struct Ref
     {
-        let id = NSUUID()
-        let observable : Observable
+        let id          = NSUUID()
+        let observable  : Observable
+        let observer    : (Observable) -> Void
+        
         func remove() -> Bool       { return observable.removeObserver(self) }
+        func notify()               { observer(observable) }
     }
     
     
     // properties
-    var observers: [(Observable) -> Void] = []
-    var refs: [Ref] = []            // required for removing observers (can't compare fns)
+    var refs: [Ref] = []
     
     
     
     // public functions
     func addObserver(_ observer: @escaping (Observable) -> Void) -> Ref
     {
-        refs.append(Ref(observable: self))
-        observers.append(observer)
-        return refs.last!
+        let ref = Ref(observable: self, observer: observer)
+        refs.append(ref)
+        return ref
     }
     
     
     // intended only for classes inheriting Observable
     func notify()
     {
-        observers.forEach   { $0(self) }
+        refs.forEach   { $0.notify() }
     }
-    
     
     
     
@@ -53,7 +54,6 @@ class Observable
     {
         if let index = refs.index(where: { $0 == ref } )
         {
-            _ = observers.remove(at: index)
             _ = refs.remove(at: index)
             return true
         }
