@@ -15,7 +15,7 @@ import Foundation
 
 class MutableProperty<T>: Observable
 {
-    private var history: [T] = []
+    var history: [T] = []       // only this class should write, others can read
     
     init(_ newValue: T) {
         history.append(newValue)
